@@ -6,25 +6,31 @@ const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
 const estadoUI = $('#estadoUI');
 const setEstado = (msg) => { estadoUI.textContent = msg; };
-setEstado('Listo');
+setEstado('Universidad Tecnológica de Tlaxcala');
 
-// Referencias a elementos del DOM
+// referencias a elementos de DOM
+
 const btnCambiarMensaje = $('#btnCambiarMensaje');
 const titulo = $('#tituloPrincipal');
 const subtitulo = $('#subtitulo');
 
-// Manejador de eventos
-btnCambiarMensaje.addEventListener('click', () => {
+//
+btnCambiarMensaje.addEventListener('click', () => {  
     const alt = titulo.dataset.alt === '1';
+    let estadoText = "";
 
     titulo.textContent = alt
-        ? '¡Bienvenido a la Aplicación!'
-        : '¡Hola, mundo!';
+        ? 'Bienvenido a la App mis SauFlogers'
+        : 'Hoy veremos la manipulación del DOM!';
 
     subtitulo.textContent = alt
-        ? 'Explora las funcionalidades disponibles.'
-        : 'Hoy veremos cómo manipular el DOM.';
+        ? 'Hola'
+        : '¡HAS SIDO HACKEADOOOOOO!';
 
-    titulo.dataset.alt = alt  ? '0' : '1';
-    setEstado('Textos actualizados');
+    titulo.dataset.alt = alt ? '0' : '1';
+    
+    estadoText = alt
+        ? 'El texto no ha sido alterado (aún)'
+        : '!¡!¡EL TEXTO HA SIDO TOTALMENTE ALTERADOOOO¡!¡!';
+    setEstado(`${ estadoText }`);
 });
