@@ -34,3 +34,16 @@ btnCambiarMensaje.addEventListener('click', () => {
         : '!¡!¡EL TEXTO HA SIDO TOTALMENTE ALTERADOOOO¡!¡!';
     setEstado(`${ estadoText }`);
 });
+
+const listaArticulos = $('#listaArticulos');
+listaArticulos.addEventListener('mouseover', (event) => {
+    const card = event.target.closest('.card');
+    if (!card) return;
+    card.classList.add('is-highlight');
+    
+ });
+ listaArticulos.addEventListener('mouseout', (event) => {
+    const card = event.target.closest('.card');
+    if (!card) return;
+    card.classList.remove('is-highlight');
+ });
