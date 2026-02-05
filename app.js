@@ -47,3 +47,24 @@ listaArticulos.addEventListener('mouseover', (event) => {
     if (!card) return;
     card.classList.remove('is-highlight');
  });
+
+ // Agregar elementos al dom
+const btnAgregarCard = $('#btnAgregarCard');
+const listaArticulos2 = $('#listaArticulos');
+
+btnAgregarCard.addEventListener('click', () => {
+    const new_article = document.createElement('article');
+    new_article.className = 'card';
+    new_article.dataset.tags = 'agentes';
+    new_article.innerHTML = `
+        <h3 class="card-title">Nueva Tarjeta</h3>
+        <p class="card-text">Basura entra, basura sale; y además puede amplificar sesgos.</p>
+        <div class="card-actions">
+            <button class="btn small" type="button" data-action="like">👍 Like</button>
+            <button class="btn small ghost" type="button" data-action="remove">Eliminar</button>
+            <span class="badge" aria-label="likes">0</span>
+        </div>
+    `;
+    listaArticulos2.append(new_article);
+    setEstado('Nueva card agregada');
+});
