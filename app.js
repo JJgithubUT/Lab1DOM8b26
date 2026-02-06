@@ -48,10 +48,13 @@ listaArticulos.addEventListener('mouseover', (event) => {
     card.classList.remove('is-highlight');
  });
 
- // Agregar elementos al dom
+ // Modificar elementos del dom
 const btnAgregarCard = $('#btnAgregarCard');
+const btnLimpiarCard = $('#btnLimpiarCard');
 const listaArticulos2 = $('#listaArticulos');
 
+
+ // Agregar elementos del dom
 btnAgregarCard.addEventListener('click', () => {
     const new_article = document.createElement('article');
     new_article.className = 'card';
@@ -67,4 +70,16 @@ btnAgregarCard.addEventListener('click', () => {
     `;
     listaArticulos2.append(new_article);
     setEstado('Nueva card agregada');
+});
+
+ // Eliminar elementos del dom
+btnLimpiarCard.addEventListener('click', () => {
+    const cards = $$('#listaArticulos .card');
+    let removed = 0; // los articulos a borrar
+    cards.forEach(card => {
+        if (card.dataset.seed == 'true') return;
+        card.remove();
+        removed++;
+    });
+    setEstado(`N° de Articulos eliminados ${ removed }`);
 });
