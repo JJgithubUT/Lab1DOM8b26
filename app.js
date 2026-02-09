@@ -12,6 +12,7 @@ setEstado('Universidad Tecnológica de Tlaxcala');
 const btnCambiarMensaje = $('#btnCambiarMensaje');
 const titulo = $('#tituloPrincipal');
 const subtitulo = $('#subtitulo');
+const listaArticulos = $('#listaArticulos');
 
 // funciones
 const buildCard = ({ title, text, tags }) => {
@@ -54,7 +55,6 @@ btnCambiarMensaje.addEventListener('click', () => {
     setEstado(estadoText);
 });
 
-const listaArticulos = $('#listaArticulos');
 listaArticulos.addEventListener('mouseover', (event) => {
     const card = event.target.closest('.card');
     if (!card) return;
@@ -98,8 +98,8 @@ btnLimpiarCard.addEventListener('click', () => {
 });
 
 // Delegación de eventos
-listaArticulos.addEventListener('click', (event) => {
-    const btn = event.target.closest('[data-action]');
+listaArticulos.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action]');
     if (!btn) return;
 
     const card = btn.closest('.card');
