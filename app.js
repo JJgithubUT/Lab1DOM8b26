@@ -97,7 +97,7 @@ btnLimpiarCard.addEventListener('click', () => {
     setEstado(`N° de Articulos eliminados ${removed}`);
 });
 
-// ✅ Delegación de eventos
+// Delegación de eventos
 listaArticulos.addEventListener('click', (event) => {
     const btn = event.target.closest('[data-action]');
     if (!btn) return;
@@ -114,5 +114,26 @@ listaArticulos.addEventListener('click', (event) => {
     if (btn.dataset.action === 'like') {
         const badge = card.querySelector('.badge');
         badge.textContent = Number(badge.textContent) + 1;
+        setEstado('Card likeada');
     }
 });
+
+/*
+
+// Manejar los eventos like
+const likeButtons = querySelectorAll('#listaArticulos button[data-action="like"]');
+likeButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const card = btn.closest('.card');
+        hacerLike(card);
+    });
+});
+
+const doLike = (card) => {
+    const badge = card.querySelector('.badge');
+    const currentLikes = Number(badge.textContent) || 0;
+    badge.textContent = currentLikes + 1;
+    setEstado('Like + 1');
+};
+
+*/
