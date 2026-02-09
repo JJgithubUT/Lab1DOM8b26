@@ -55,18 +55,6 @@ btnCambiarMensaje.addEventListener('click', () => {
     setEstado(estadoText);
 });
 
-listaArticulos.addEventListener('mouseover', (event) => {
-    const card = event.target.closest('.card');
-    if (!card) return;
-    card.classList.add('is-highlight');
-});
-
-listaArticulos.addEventListener('mouseout', (event) => {
-    const card = event.target.closest('.card');
-    if (!card) return;
-    card.classList.remove('is-highlight');
-});
-
 // Modificar elementos del DOM
 const btnAgregarCard = $('#btnAgregarCard');
 const btnLimpiarCard = $('#btnLimpiarCard');
