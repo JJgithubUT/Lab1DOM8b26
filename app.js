@@ -25,6 +25,7 @@ const buildCard = ({ title, text, tags }) => {
         <p class="card-text"></p>
         <div class="card-actions">
             <button class="btn small" type="button" data-action="like">👍</button>
+            <button class="btn small delete" type="button" data-action="dislike">👎</button>
             <button class="btn small ghost" type="button" data-action="remove">❎</button>
             <span class="badge" aria-label="likes">0</span>
         </div>
@@ -91,18 +92,30 @@ listaArticulos.addEventListener('click', (e) => {
     if (!btn) return;
 
     const card = btn.closest('.card');
+    const badge = card.querySelector('.badge');
+    const currentLikes = Number(badge.textContent);
+
     if (!card) return;
 
+    // Eliminar la tarjeta
     if (btn.dataset.action === 'remove') {
         if (card.dataset.seed === 'true') return;
         card.remove();
         setEstado('Card eliminada');
+    }   
+
+    // Dar like a la tarjeta
+    if (btn.dataset.action === 'like') {
+        badge.textContent = currentLikes + 1;
+        setEstado('Card likeada');
     }
 
-    if (btn.dataset.action === 'like') {
-        const badge = card.querySelector('.badge');
-        badge.textContent = Number(badge.textContent) + 1;
-        setEstado('Card likeada');
+    // Quitar like a la tarjeta
+    if (btn.dataset.action === 'dislike') {
+        currentLikes > 0
+            ? badge.textContent = currentLikes - 1
+        : badge.textContent = 0;
+        setEstado('Card dislikeada');
     }
 });
 
@@ -123,5 +136,14 @@ const doLike = (card) => {
     badge.textContent = currentLikes + 1;
     setEstado('Like + 1');
 };
+
+const doRemove = (card) => {
+    const badge = card.querySelector('.badge');
+    const currentLikes = Number(badge.textContent) || 0;
+    currentLikes > 0
+        ? badge.textContent = currentLikes - 1
+        : badge.textContent = 0;
+    setEstado('Like eliminado de un articulo');
+}
 
 */

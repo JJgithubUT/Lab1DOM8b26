@@ -69,6 +69,7 @@ a:hover{ text-decoration:underline; }
   padding:.6rem .85rem; border-radius:.8rem; cursor:pointer; font-weight:600;
 }
 .btn.ghost{ background:transparent; color:var(--text); }
+.btn.delete{ background: red; }
 .btn.small{ padding:.35rem .55rem; border-radius:.6rem; font-weight:600; }
 
 .hero{ padding:2rem 0 1.25rem; border-bottom:1px solid var(--line); }
