@@ -119,6 +119,27 @@ listaArticulos.addEventListener('click', (e) => {
     }
 });
 
+const filtro = $('#filtro');
+
+const matchText = (card, q) => {
+    const title = card.querySelector('.card-title')?.textContent ?? '';
+    const text = card.querySelector('card-text')?.textContent ?? '';
+    const hayStack = (title + '' + text).toLowerCase();
+    return hayStack.includes(q);
+}
+
+filtro.addEventListener('input', () => {
+    const q = filtro.value.trim().toLowerCase();
+    const cards = $$('#listaArticulos .card');
+
+    cards.forEach(card => {
+        const ok = q === '' ? true :matchText(card,q);
+        card.hidden = !ok;
+    });
+
+    setEstado(q === '' ? 'Filtro vacío' : `Filtro texto: "${q}"`);
+});
+
 /*
 
 // Manejar los eventos like
