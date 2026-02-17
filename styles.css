@@ -155,6 +155,6 @@ dd{ margin:.25rem 0 0; color:var(--muted); }
   .menu.is-open{ display:flex; flex-direction:column; gap:.5rem; }
 }
 
-(hidden) {
+[hidden] {
   display: none !important;
 }

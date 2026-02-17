@@ -123,22 +123,60 @@ const filtro = $('#filtro');
 
 const matchText = (card, q) => {
     const title = card.querySelector('.card-title')?.textContent ?? '';
-    const text = card.querySelector('card-text')?.textContent ?? '';
+    const text = card.querySelector('.card-text')?.textContent ?? '';
     const hayStack = (title + '' + text).toLowerCase();
     return hayStack.includes(q);
 }
 
 filtro.addEventListener('input', () => {
-    const q = filtro.value.trim().toLowerCase();
+    const consulta = filtro.value.trim().toLowerCase();
     const cards = $$('#listaArticulos .card');
 
     cards.forEach(card => {
-        const ok = q === '' ? true :matchText(card,q);
+        const ok = consulta === '' ? true :matchText(card,q);
         card.hidden = !ok;
     });
 
-    setEstado(q === '' ? 'Filtro vacío' : `Filtro texto: "${q}"`);
+    setEstado(consulta === '' ? 'Filtro vacío' : `Filtro texto: "${consulta}"`);
 });
+
+const listaChips = $('#chips');
+
+listaChips.addEventListener('click', e => {
+    const btn = e.target.closest('[data-tag]');
+    if (!btn) return;
+
+    const chip = btn.closest('.chip');
+    const consulta = chip.dataset.tag.trim().toLowerCase();
+    const cards = $$('#listaArticulos .card');
+
+    if (consulta === 'reiniciar') {
+            
+    } else {
+        const ok = consulta === '' ? true :matchText(card,consulta);
+        card.hidden = !ok;
+    }
+
+    cards.forEach(card => {
+        if (consulta === 'reiniciar') {
+            
+        } else {
+            const ok = consulta === '' ? true :matchText(card,consulta);
+            card.hidden = !ok;
+        }
+    });
+});
+
+const filterState = {
+    q:   '',
+    tag: '',
+};
+
+const matchTag = (card, tag) => {
+    if (!tag) return true;
+    const tags = (card.dataset.tags || '').toLowerCase();
+    return tags.includes(tag.toLowerCase());
+};
 
 /*
 
