@@ -128,8 +128,9 @@ const matchText = (card, q) => {
     return hayStack.includes(q);
 }
 
+// Evento de tipo input: mientras se escribe en la caja, se aplican los filtros
 filtro.addEventListener('input', () => {
-    const consulta = filtro.value.trim().toLowerCase();
+    /* const consulta = filtro.value.trim().toLowerCase();
     const cards = $$('#listaArticulos .card');
 
     cards.forEach(card => {
@@ -137,7 +138,9 @@ filtro.addEventListener('input', () => {
         card.hidden = !ok;
     });
 
-    setEstado(consulta === '' ? 'Filtro vacío' : `Filtro texto: "${consulta}"`);
+    setEstado(consulta === '' ? 'Filtro vacío' : `Filtro texto: "${consulta}"`); */
+    filterState.q = filtro.value.trim().toLowerCase();
+    applyFilters();
 });
 
 const listaChips = $('#chips');
@@ -150,21 +153,26 @@ listaChips.addEventListener('click', e => {
     const consulta = chip.dataset.tag.trim().toLowerCase();
     const cards = $$('#listaArticulos .card');
 
-    if (consulta === 'reiniciar') {
+    /* if (consulta === 'reiniciar') {
             
     } else {
         const ok = consulta === '' ? true :matchText(card,consulta);
         card.hidden = !ok;
-    }
+    } */
 
-    cards.forEach(card => {
+    filterState.tag = (filterState.tag === tag) ? '' : tag;
+    applyFilters
+
+    /* cards.forEach(card => {
         if (consulta === 'reiniciar') {
-            
+            // Aquí poner el código de reinicio de código    
         } else {
             const ok = consulta === '' ? true :matchText(card,consulta);
             card.hidden = !ok;
         }
-    });
+        const ok = consulta === '' ? true :matchText(card,consulta);
+        card.hidden = !ok;
+    }); */
 });
 
 const filterState = {
@@ -176,6 +184,23 @@ const matchTag = (card, tag) => {
     if (!tag) return true;
     const tags = (card.dataset.tags || '').toLowerCase();
     return tags.includes(tag.toLowerCase());
+};
+
+const applyFilters = () => {
+    const cards = $$('#listaArticulos .card');
+    cards.forEach((card) => {
+        const okText = filterState.q ? matchText(card,filterState.q) : true;
+        const okTag = matchTag(card, filterState.tag);
+        card.hidden = !(okText && okTag);
+    });
+
+    const parts = [];
+    if (filterState.q) parts.push(`texto: "${filterState.q}"`);
+    if (filterState.tag) parts.push(`tag: "${filterState.tag}"`);
+    setEstado(parts.length > 0
+        ? `Filtros : ${parts.join(' + ')}`
+        : 'Filtros: ninguno'
+    );
 };
 
 /*
