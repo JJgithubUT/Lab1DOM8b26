@@ -130,15 +130,6 @@ const matchText = (card, q) => {
 
 // Evento de tipo input: mientras se escribe en la caja, se aplican los filtros
 filtro.addEventListener('input', () => {
-    /* const consulta = filtro.value.trim().toLowerCase();
-    const cards = $$('#listaArticulos .card');
-
-    cards.forEach(card => {
-        const ok = consulta === '' ? true :matchText(card,q);
-        card.hidden = !ok;
-    });
-
-    setEstado(consulta === '' ? 'Filtro vacío' : `Filtro texto: "${consulta}"`); */
     filterState.q = filtro.value.trim().toLowerCase();
     applyFilters();
 });
@@ -150,29 +141,9 @@ listaChips.addEventListener('click', e => {
     if (!btn) return;
 
     const chip = btn.closest('.chip');
-    const consulta = chip.dataset.tag.trim().toLowerCase();
-    const cards = $$('#listaArticulos .card');
-
-    /* if (consulta === 'reiniciar') {
-            
-    } else {
-        const ok = consulta === '' ? true :matchText(card,consulta);
-        card.hidden = !ok;
-    } */
 
     filterState.tag = (filterState.tag === tag) ? '' : tag;
-    applyFilters
-
-    /* cards.forEach(card => {
-        if (consulta === 'reiniciar') {
-            // Aquí poner el código de reinicio de código    
-        } else {
-            const ok = consulta === '' ? true :matchText(card,consulta);
-            card.hidden = !ok;
-        }
-        const ok = consulta === '' ? true :matchText(card,consulta);
-        card.hidden = !ok;
-    }); */
+    applyFilters();
 });
 
 const filterState = {
@@ -203,31 +174,42 @@ const applyFilters = () => {
     );
 };
 
-/*
+const formNewsLetter = $('#formNewsLetter');
+const email = $('#email');
+const interes = $('#interes');
+const feedback = $('#feedback');
 
-// Manejar los eventos like
-const likeButtons = querySelectorAll('#listaArticulos button[data-action="like"]');
-likeButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const card = btn.closest('.card');
-        hacerLike(card);
-    });
+// Validar email con expresión regular simple
+const isValidEmail = (value) => /^[^\s@]+@[^s@]+\.[^\s@]+$/.test(value);
+
+formNewsLetter.addEventListener('submit', (e) => {
+    e.preventDefault(); // Evitar envio precoz del formulario
+    const valueEmail = email.value.trim();
+    const valueInterest = interes.value.trim();
+
+    email.classList.remove('is-valid');
+    interes.classList.remove('is-invalid');
+    feedback.textContent = '';
+
+    let ok = true;
+
+    if (!isValidEmail(valueEmail)) {
+        email.classList.add('is-invalid');
+        ok = false;
+    }
+
+    if (!valueInterest) {
+        interes.classList.add('is-invalid')
+        of = false
+    }
+
+    if (!valueInterest) {
+        feedback.textContent = 'Revisa los cmapos marcados';
+        setEstado('Formulario con errores');
+        return;
+    }
+
+    // Simular envío de datos
+    feedback.textContent = `¡Gracias x suscribirte! Tematica de interés: "${valueInterest}"`;
+    setEstado('Formulario enviado con éxito');
 });
-
-const doLike = (card) => {
-    const badge = card.querySelector('.badge');
-    const currentLikes = Number(badge.textContent) || 0;
-    badge.textContent = currentLikes + 1;
-    setEstado('Like + 1');
-};
-
-const doRemove = (card) => {
-    const badge = card.querySelector('.badge');
-    const currentLikes = Number(badge.textContent) || 0;
-    currentLikes > 0
-        ? badge.textContent = currentLikes - 1
-        : badge.textContent = 0;
-    setEstado('Like eliminado de un articulo');
-}
-
-*/
