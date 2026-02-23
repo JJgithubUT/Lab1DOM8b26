@@ -213,3 +213,23 @@ formNewsLetter.addEventListener('submit', (e) => {
     feedback.textContent = `¡Gracias x suscribirte! Tematica de interés: "${valueInterest}"`;
     setEstado('Formulario enviado con éxito');
 });
+
+// Carga asíncrona de noticias
+const listaNoticias = $('#listaNoticias');
+
+const renderNoticias = (items) => {
+    listaNoticias.innerHTML = '';
+    if ( !items || items.length === 0 ) {
+        const li = document.createElement('li');
+        li.textContent = 'No se encontraron noticias.';
+        listaNoticias.append(li);
+        return;
+    }
+    items.forEach((t) => {
+        const li = document.createElement('li');
+        li.textContent = t;
+        listaNoticias.append(li);
+    });
+};
+
+renderNoticias(['N1', 'N2', 'N3']);
