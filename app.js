@@ -233,12 +233,12 @@ const renderNoticias = (items) => {
 renderNoticias(['N1', 'N2', 'N3']);
 
 // Simular servicio fetch
-const fakeFetchNoticias = () => {
+const fetchFakeNews = () => {
     return new Promise((resolve, reject) => {
-        const shouldFail = Math.random() < 0.2; // 20% de probabilidad de fallo
+        const shouldFail = Math.random() < 0.5; // 50% de probabilidad de fallo
         setTimeout(() => {
             if (shouldFail) {
-                reject(new Error('Fallo de red simulado.'));
+                reject(new Error('Eres escoria humana. Conecta la red, maldito inútil.'));
                 return;
             }
             resolve([
@@ -246,24 +246,29 @@ const fakeFetchNoticias = () => {
                 'OpenAI lanza mejoras en asistentes inteligentes',
                 'Debate sobre ética en sistemas de IA crece en 2026',
             ]);
-        }, 1500);
+            // \\|// Estado cuando no regresa datos
+            /* resolve([]); */
+        }, 2500);
     });
 };
 
 const btnCargar = $('#btnCargar');
 
 btnCargar.addEventListener('click', async () => {
+    btnCargar.disabled = true;
     setEstado('Cargando noticias...');
     listaNoticias.innerHTML = '<li>Cargando...</li>';
     feedbackNoticias.textContent = '';
 
     try {
-        const noticias = await fakeFetchNoticias();
+        const noticias = await fetchFakeNews();
         renderNoticias(noticias);
         setEstado('Noticias cargadas');
     } catch (error) {
         renderNoticias([]);
         feedbackNoticias.textContent = error.message;
         setEstado('Error al cargar noticias');
+    } finally {
+        btnCargar.disabled = false;
     }
 });
