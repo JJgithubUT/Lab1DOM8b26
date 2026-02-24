@@ -63,7 +63,7 @@ const btnLimpiarCard = $('#btnLimpiarCard');
 // Agregar elementos al DOM
 btnAgregarCard.addEventListener('click', () => {
     const new_article = buildCard({
-        title: 'Nuevo Articulo',
+        title: 'Nuevo Artículo',
         text: 'Editar texto',
         tags: 'nuevo articulo'
     });
@@ -83,7 +83,7 @@ btnLimpiarCard.addEventListener('click', () => {
         removed++;
     });
 
-    setEstado(`N° de Articulos eliminados ${removed}`);
+    setEstado(`N° de Artículos eliminados: ${removed}`);
 });
 
 // Delegación de eventos
@@ -92,59 +92,39 @@ listaArticulos.addEventListener('click', (e) => {
     if (!btn) return;
 
     const card = btn.closest('.card');
+    if (!card) return;
+
     const badge = card.querySelector('.badge');
     const currentLikes = Number(badge.textContent);
 
-    if (!card) return;
-
-    // Eliminar la tarjeta
     if (btn.dataset.action === 'remove') {
         if (card.dataset.seed === 'true') return;
         card.remove();
         setEstado('Card eliminada');
     }   
 
-    // Dar like a la tarjeta
     if (btn.dataset.action === 'like') {
         badge.textContent = currentLikes + 1;
         setEstado('Card likeada');
     }
 
-    // Quitar like a la tarjeta
     if (btn.dataset.action === 'dislike') {
-        currentLikes > 0
-            ? badge.textContent = currentLikes - 1
-        : badge.textContent = 0;
+        badge.textContent = currentLikes > 0 ? currentLikes - 1 : 0;
         setEstado('Card dislikeada');
     }
 });
 
+// Filtros
 const filtro = $('#filtro');
 
 const matchText = (card, q) => {
     const title = card.querySelector('.card-title')?.textContent ?? '';
     const text = card.querySelector('.card-text')?.textContent ?? '';
-    const hayStack = (title + '' + text).toLowerCase();
+    const hayStack = (title + ' ' + text).toLowerCase();
     return hayStack.includes(q);
-}
-
-// Evento de tipo input: mientras se escribe en la caja, se aplican los filtros
-filtro.addEventListener('input', () => {
-    filterState.q = filtro.value.trim().toLowerCase();
-    applyFilters();
-});
+};
 
 const listaChips = $('#chips');
-
-listaChips.addEventListener('click', e => {
-    const btn = e.target.closest('[data-tag]');
-    if (!btn) return;
-
-    const chip = btn.closest('.chip');
-
-    filterState.tag = (filterState.tag === tag) ? '' : tag;
-    applyFilters();
-});
 
 const filterState = {
     q:   '',
@@ -160,7 +140,7 @@ const matchTag = (card, tag) => {
 const applyFilters = () => {
     const cards = $$('#listaArticulos .card');
     cards.forEach((card) => {
-        const okText = filterState.q ? matchText(card,filterState.q) : true;
+        const okText = filterState.q ? matchText(card, filterState.q) : true;
         const okTag = matchTag(card, filterState.tag);
         card.hidden = !(okText && okTag);
     });
@@ -168,26 +148,42 @@ const applyFilters = () => {
     const parts = [];
     if (filterState.q) parts.push(`texto: "${filterState.q}"`);
     if (filterState.tag) parts.push(`tag: "${filterState.tag}"`);
-    setEstado(parts.length > 0
-        ? `Filtros : ${parts.join(' + ')}`
+    setEstado(parts.length
+        ? `Filtros: ${parts.join(' + ')}`
         : 'Filtros: ninguno'
     );
 };
 
-const formNewsLetter = $('#formNewsLetter');
+filtro.addEventListener('input', () => {
+    filterState.q = filtro.value.trim().toLowerCase();
+    applyFilters();
+});
+
+listaChips.addEventListener('click', e => {
+    const btn = e.target.closest('[data-tag]');
+    if (!btn) return;
+
+    const tag = btn.dataset.tag; 
+    filterState.tag = (filterState.tag === tag) ? '' : tag;
+    applyFilters();
+});
+
+// Formulario newsletter
+const formNewsLetter = $('#formNewsletter');
 const email = $('#email');
 const interes = $('#interes');
 const feedback = $('#feedback');
 
-// Validar email con expresión regular simple
-const isValidEmail = (value) => /^[^\s@]+@[^s@]+\.[^\s@]+$/.test(value);
+// Validar email con regex correcta
+const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
 formNewsLetter.addEventListener('submit', (e) => {
-    e.preventDefault(); // Evitar envio precoz del formulario
+    e.preventDefault();
+
     const valueEmail = email.value.trim();
     const valueInterest = interes.value.trim();
 
-    email.classList.remove('is-valid');
+    email.classList.remove('is-invalid');
     interes.classList.remove('is-invalid');
     feedback.textContent = '';
 
@@ -199,27 +195,29 @@ formNewsLetter.addEventListener('submit', (e) => {
     }
 
     if (!valueInterest) {
-        interes.classList.add('is-invalid')
-        of = false
+        interes.classList.add('is-invalid');
+        ok = false;
     }
 
-    if (!valueInterest) {
-        feedback.textContent = 'Revisa los cmapos marcados';
+    if (!ok) {
+        feedback.textContent = 'Revisa los campos marcados';
         setEstado('Formulario con errores');
         return;
     }
 
-    // Simular envío de datos
-    feedback.textContent = `¡Gracias x suscribirte! Tematica de interés: "${valueInterest}"`;
+    feedback.textContent = `¡Gracias por suscribirte! Tema de interés: "${valueInterest}"`;
     setEstado('Formulario enviado con éxito');
 });
 
 // Carga asíncrona de noticias
 const listaNoticias = $('#listaNoticias');
+const feedbackNoticias = document.createElement('p');
+feedbackNoticias.className = 'feedback';
+listaNoticias.after(feedbackNoticias);
 
 const renderNoticias = (items) => {
     listaNoticias.innerHTML = '';
-    if ( !items || items.length === 0 ) {
+    if (!items || items.length === 0) {
         const li = document.createElement('li');
         li.textContent = 'No se encontraron noticias.';
         listaNoticias.append(li);
@@ -233,3 +231,39 @@ const renderNoticias = (items) => {
 };
 
 renderNoticias(['N1', 'N2', 'N3']);
+
+// Simular servicio fetch
+const fakeFetchNoticias = () => {
+    return new Promise((resolve, reject) => {
+        const shouldFail = Math.random() < 0.2; // 20% de probabilidad de fallo
+        setTimeout(() => {
+            if (shouldFail) {
+                reject(new Error('Fallo de red simulado.'));
+                return;
+            }
+            resolve([
+                'Nuevo modelo de IA logra mejores resultados en visión',
+                'OpenAI lanza mejoras en asistentes inteligentes',
+                'Debate sobre ética en sistemas de IA crece en 2026',
+            ]);
+        }, 1500);
+    });
+};
+
+const btnCargar = $('#btnCargar');
+
+btnCargar.addEventListener('click', async () => {
+    setEstado('Cargando noticias...');
+    listaNoticias.innerHTML = '<li>Cargando...</li>';
+    feedbackNoticias.textContent = '';
+
+    try {
+        const noticias = await fakeFetchNoticias();
+        renderNoticias(noticias);
+        setEstado('Noticias cargadas');
+    } catch (error) {
+        renderNoticias([]);
+        feedbackNoticias.textContent = error.message;
+        setEstado('Error al cargar noticias');
+    }
+});
