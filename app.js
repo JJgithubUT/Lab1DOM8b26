@@ -1,6 +1,6 @@
 'use strict';
 
-// Declaración de utilidades y referencias
+// --- Utilidades ---
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
@@ -8,13 +8,28 @@ const estadoUI = $('#estadoUI');
 const setEstado = (msg) => { estadoUI.textContent = msg; };
 setEstado('Universidad Tecnológica de Tlaxcala');
 
-// referencias a elementos de DOM
+// --- Referencias al DOM ---
 const btnCambiarMensaje = $('#btnCambiarMensaje');
 const titulo = $('#tituloPrincipal');
 const subtitulo = $('#subtitulo');
 const listaArticulos = $('#listaArticulos');
+const btnAgregarCard = $('#btnAgregarCard');
+const btnLimpiarCard = $('#btnLimpiarCard');
+const filtro = $('#filtro');
+const listaChips = $('#chips');
+const formNewsLetter = $('#formNewsletter');
+const email = $('#email');
+const interes = $('#interes');
+const feedback = $('#feedback');
+const listaNoticias = $('#listaNoticias');
+const btnCargar = $('#btnCargar');
 
-// funciones
+// Crear feedback de noticias si no existe
+const feedbackNoticias = document.createElement('p');
+feedbackNoticias.className = 'feedback';
+listaNoticias.after(feedbackNoticias);
+
+// --- Funciones de Construcción ---
 const buildCard = ({ title, text, tags }) => {
     const article = document.createElement('article');
     article.className = 'card';
@@ -35,185 +50,17 @@ const buildCard = ({ title, text, tags }) => {
     return article;
 };
 
-// Eventos
-btnCambiarMensaje.addEventListener('click', () => {  
-    const alt = titulo.dataset.alt === '1';
-    let estadoText = "";
+// --- Lógica de Noticias (Fetch JSON + Random 5) ---
 
-    titulo.textContent = alt
-        ? 'Bienvenido a la App mis SauFlogers'
-        : 'Hoy veremos la manipulación del DOM!';
-
-    subtitulo.textContent = alt
-        ? 'Hola'
-        : '¡HAS SIDO HACKEADOOOOOO!';
-
-    titulo.dataset.alt = alt ? '0' : '1';
-    
-    estadoText = alt
-        ? 'El texto no ha sido alterado (aún)'
-        : '!¡!¡EL TEXTO HA SIDO TOTALMENTE ALTERADOOOO¡!¡!';
-    setEstado(estadoText);
-});
-
-// Modificar elementos del DOM
-const btnAgregarCard = $('#btnAgregarCard');
-const btnLimpiarCard = $('#btnLimpiarCard');
-
-// Agregar elementos al DOM
-btnAgregarCard.addEventListener('click', () => {
-    const new_article = buildCard({
-        title: 'Nuevo Artículo',
-        text: 'Editar texto',
-        tags: 'nuevo articulo'
-    });
-
-    listaArticulos.append(new_article);
-    setEstado('Nueva card agregada');
-});
-
-// Eliminar elementos del DOM
-btnLimpiarCard.addEventListener('click', () => {
-    const cards = $$('#listaArticulos .card');
-    let removed = 0;
-
-    cards.forEach(card => {
-        if (card.dataset.seed === 'true') return;
-        card.remove();
-        removed++;
-    });
-
-    setEstado(`N° de Artículos eliminados: ${removed}`);
-});
-
-// Delegación de eventos
-listaArticulos.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-
-    const card = btn.closest('.card');
-    if (!card) return;
-
-    const badge = card.querySelector('.badge');
-    const currentLikes = Number(badge.textContent);
-
-    if (btn.dataset.action === 'remove') {
-        if (card.dataset.seed === 'true') return;
-        card.remove();
-        setEstado('Card eliminada');
-    }   
-
-    if (btn.dataset.action === 'like') {
-        badge.textContent = currentLikes + 1;
-        setEstado('Card likeada');
+// Mezclar un array aleatoriamente (fisher-yates)
+const shuffleArray = (array) => {
+    const newArr = [...array];
+    for (let i = newArr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
     }
-
-    if (btn.dataset.action === 'dislike') {
-        badge.textContent = currentLikes > 0 ? currentLikes - 1 : 0;
-        setEstado('Card dislikeada');
-    }
-});
-
-// Filtros
-const filtro = $('#filtro');
-
-const matchText = (card, q) => {
-    const title = card.querySelector('.card-title')?.textContent ?? '';
-    const text = card.querySelector('.card-text')?.textContent ?? '';
-    const hayStack = (title + ' ' + text).toLowerCase();
-    return hayStack.includes(q);
+    return newArr;
 };
-
-const listaChips = $('#chips');
-
-const filterState = {
-    q:   '',
-    tag: '',
-};
-
-const matchTag = (card, tag) => {
-    if (!tag) return true;
-    const tags = (card.dataset.tags || '').toLowerCase();
-    return tags.includes(tag.toLowerCase());
-};
-
-const applyFilters = () => {
-    const cards = $$('#listaArticulos .card');
-    cards.forEach((card) => {
-        const okText = filterState.q ? matchText(card, filterState.q) : true;
-        const okTag = matchTag(card, filterState.tag);
-        card.hidden = !(okText && okTag);
-    });
-
-    const parts = [];
-    if (filterState.q) parts.push(`texto: "${filterState.q}"`);
-    if (filterState.tag) parts.push(`tag: "${filterState.tag}"`);
-    setEstado(parts.length
-        ? `Filtros: ${parts.join(' + ')}`
-        : 'Filtros: ninguno'
-    );
-};
-
-filtro.addEventListener('input', () => {
-    filterState.q = filtro.value.trim().toLowerCase();
-    applyFilters();
-});
-
-listaChips.addEventListener('click', e => {
-    const btn = e.target.closest('[data-tag]');
-    if (!btn) return;
-
-    const tag = btn.dataset.tag; 
-    filterState.tag = (filterState.tag === tag) ? '' : tag;
-    applyFilters();
-});
-
-// Formulario newsletter
-const formNewsLetter = $('#formNewsletter');
-const email = $('#email');
-const interes = $('#interes');
-const feedback = $('#feedback');
-
-// Validar email con regex correcta
-const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-
-formNewsLetter.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const valueEmail = email.value.trim();
-    const valueInterest = interes.value.trim();
-
-    email.classList.remove('is-invalid');
-    interes.classList.remove('is-invalid');
-    feedback.textContent = '';
-
-    let ok = true;
-
-    if (!isValidEmail(valueEmail)) {
-        email.classList.add('is-invalid');
-        ok = false;
-    }
-
-    if (!valueInterest) {
-        interes.classList.add('is-invalid');
-        ok = false;
-    }
-
-    if (!ok) {
-        feedback.textContent = 'Revisa los campos marcados';
-        setEstado('Formulario con errores');
-        return;
-    }
-
-    feedback.textContent = `¡Gracias por suscribirte! Tema de interés: "${valueInterest}"`;
-    setEstado('Formulario enviado con éxito');
-});
-
-// Carga asíncrona de noticias
-const listaNoticias = $('#listaNoticias');
-const feedbackNoticias = document.createElement('p');
-feedbackNoticias.className = 'feedback';
-listaNoticias.after(feedbackNoticias);
 
 const renderNoticias = (items) => {
     listaNoticias.innerHTML = '';
@@ -230,45 +77,145 @@ const renderNoticias = (items) => {
     });
 };
 
-renderNoticias(['N1', 'N2', 'N3']);
-
-// Simular servicio fetch
-const fetchFakeNews = () => {
-    return new Promise((resolve, reject) => {
-        const shouldFail = Math.random() < 0.5; // 50% de probabilidad de fallo
+const fetchFakeNews = async () => {
+    await new Promise((resolve, reject) => {
         setTimeout(() => {
-            if (shouldFail) {
-                reject(new Error('Eres escoria humana. Conecta la red, maldito inútil.'));
-                return;
-            }
-            resolve([
-                'Nuevo modelo de IA logra mejores resultados en visión',
-                'OpenAI lanza mejoras en asistentes inteligentes',
-                'Debate sobre ética en sistemas de IA crece en 2026',
-            ]);
-            // \\|// Estado cuando no regresa datos
-            /* resolve([]); */
-        }, 2500);
+            Math.random() < 0.2 ? reject(new Error('Error de conexión con el servidor.')) : resolve();
+        }, 1500);
+    });
+
+    const response = await fetch('noticias.json');
+    if (!response.ok) throw new Error('No se pudo obtener el archivo JSON.');
+    
+    const data = await response.json();
+
+    return shuffleArray(data).slice(0, 5);
+};
+
+
+
+// Botón Cambiar Mensaje
+btnCambiarMensaje.addEventListener('click', () => {  
+    const alt = titulo.dataset.alt === '1';
+    titulo.textContent = alt ? 'Bienvenido a la App mis SauFlogers' : 'Hoy veremos la manipulación del DOM!';
+    subtitulo.textContent = alt ? 'Hola' : '¡HAS SIDO HACKEADOOOOOO!';
+    titulo.dataset.alt = alt ? '0' : '1';
+    setEstado(alt ? 'El texto no ha sido alterado' : '!¡!¡TEXTO ALTERADO¡!¡!');
+});
+
+// Agregar Card
+btnAgregarCard.addEventListener('click', () => {
+    const new_article = buildCard({
+        title: 'Nuevo Artículo',
+        text: 'Editar texto',
+        tags: 'nuevo articulo'
+    });
+    listaArticulos.append(new_article);
+    setEstado('Nueva card agregada');
+});
+
+// Limpiar Cards
+btnLimpiarCard.addEventListener('click', () => {
+    const cards = $$('#listaArticulos .card');
+    let removed = 0;
+    cards.forEach(card => {
+        if (card.dataset.seed === 'true') return;
+        card.remove();
+        removed++;
+    });
+    setEstado(`Artículos eliminados: ${removed}`);
+});
+
+// Delegación para Likes/Eliminar
+listaArticulos.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const card = btn.closest('.card');
+    const badge = card.querySelector('.badge');
+    const currentLikes = Number(badge.textContent);
+
+    if (btn.dataset.action === 'remove') {
+        if (card.dataset.seed === 'true') return;
+        card.remove();
+        setEstado('Card eliminada');
+    }   
+    if (btn.dataset.action === 'like') {
+        badge.textContent = currentLikes + 1;
+        setEstado('Card likeada');
+    }
+    if (btn.dataset.action === 'dislike') {
+        badge.textContent = currentLikes > 0 ? currentLikes - 1 : 0;
+        setEstado('Card dislikeada');
+    }
+});
+
+// Filtros
+const filterState = { q: '', tag: '' };
+
+const applyFilters = () => {
+    const cards = $$('#listaArticulos .card');
+    cards.forEach((card) => {
+        const title = card.querySelector('.card-title')?.textContent.toLowerCase() || '';
+        const text = card.querySelector('.card-text')?.textContent.toLowerCase() || '';
+        const tags = (card.dataset.tags || '').toLowerCase();
+        
+        const okText = (title + ' ' + text).includes(filterState.q);
+        const okTag = !filterState.tag || tags.includes(filterState.tag.toLowerCase());
+        
+        card.hidden = !(okText && okTag);
     });
 };
 
-const btnCargar = $('#btnCargar');
+filtro.addEventListener('input', () => {
+    filterState.q = filtro.value.trim().toLowerCase();
+    applyFilters();
+});
 
+listaChips.addEventListener('click', e => {
+    const btn = e.target.closest('[data-tag]');
+    if (!btn) return;
+    const tag = btn.dataset.tag; 
+    filterState.tag = (filterState.tag === tag) ? '' : tag;
+    applyFilters();
+});
+
+// Newsletter
+const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+formNewsLetter.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const isEmailOk = isValidEmail(email.value.trim());
+    const isInterestOk = interes.value.trim() !== '';
+
+    email.classList.toggle('is-invalid', !isEmailOk);
+    interes.classList.toggle('is-invalid', !isInterestOk);
+
+    if (isEmailOk && isInterestOk) {
+        feedback.textContent = '¡Suscripción exitosa!';
+        setEstado('Formulario enviado');
+    } else {
+        feedback.textContent = 'Revisa los errores';
+    }
+});
+
+// Cargar Noticias Random
 btnCargar.addEventListener('click', async () => {
     btnCargar.disabled = true;
-    setEstado('Cargando noticias...');
-    listaNoticias.innerHTML = '<li>Cargando...</li>';
+    setEstado('Buscando 5 noticias aleatorias...');
+    listaNoticias.innerHTML = '<li>Cargando noticias externas...</li>';
     feedbackNoticias.textContent = '';
 
     try {
         const noticias = await fetchFakeNews();
         renderNoticias(noticias);
-        setEstado('Noticias cargadas');
+        setEstado('Noticias actualizadas');
     } catch (error) {
         renderNoticias([]);
         feedbackNoticias.textContent = error.message;
-        setEstado('Error al cargar noticias');
+        setEstado('Error en la carga');
     } finally {
         btnCargar.disabled = false;
     }
 });
+
+// Inicialización
+renderNoticias(['Esperando noticias frescas...']);
